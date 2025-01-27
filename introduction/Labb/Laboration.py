@@ -26,7 +26,6 @@ class LinearRegression:
 
 
     def calc_variance(self):
-
         variance = np.var(self.Y)
         return variance
         
@@ -41,8 +40,6 @@ class LinearRegression:
         n = len(self.X)
         k = len(self.b)-1
         
-        
-        
 
         sig_statistic = (self.SSR/self.k)/self.S
         p_significance = stats.f.sf(sig_statistic, k, n-k-1)
@@ -54,15 +51,31 @@ class LinearRegression:
 
 
     def relevance_regression(self):
+       Rsq = self.SSR / self.Syy
+       return Rsq
+    
+
+
+
+    def individual_significance(self):
         c = np.linalg.pinv(self.X.T @ self.X)*self.variance
+        
         b3_statistic = self.b[3] / (self.S*np.sqrt(c[3,3]))
+        
         p_b3 = 2*min(stats.t.cdf(b3_statistic, self.n-self.k-1), stats.t.sf(b3_statistic, self.n-self.k-1))
         
-        Rsq = self.SSR / self.Syy
+        return p_b3
+        
 
-        return Rsq, p_b3
-    
- 
+
+    def Pearson():
+        pass
+
+
+    def confidence_intervals():
+        pass
+
+    # last add a property confidence level that stores the selected confidence level.
 
 
 # if __name__ == "__main__":
