@@ -10,7 +10,7 @@ class LinearRegression:
         self.Y = Y
         self.X = np.column_stack([np.ones(Y.shape[0]), X])
         self.n = self.X.shape[0]
-        self.k = self.X.shape[1] - 1
+        self.d = self.X.shape[1] - 1
         self.b = self.fit()
         self.SSE = np.sum(np.square(self.Y-(self.X @ self.b)))
         self.Syy = (self.n *np.sum(np.square(self.Y)) - np.square(np.sum(self.Y)))/self.n
@@ -26,28 +26,23 @@ class LinearRegression:
 
 
     def calc_variance(self):
-        variance = np.var(self.Y)
+        variance = self.SSE / (self.n - self.d -1)
         return variance
         
 
 
     def calc_std(self):
-       standard_deviation = np.std(self.Y)
+       standard_deviation = self.variance ** 0.5
        return standard_deviation
 
 
     def significance_regression(self):
-        n = len(self.X)
-        k = len(self.b)-1
-        
-
-        sig_statistic = (self.SSR/self.k)/self.S
-        p_significance = stats.f.sf(sig_statistic, k, n-k-1)
+        sig_statistic = (self.SSR/self.d)/self.S
+        p_significance = stats.f.sf(sig_statistic, self.d, self.n-self.d-1)
 
         return p_significance
         
-        # finding p-value, SSR = Syy - SSE
-
+        
 
 
     def relevance_regression(self):
@@ -60,23 +55,24 @@ class LinearRegression:
     def individual_significance(self):
         c = np.linalg.pinv(self.X.T @ self.X)*self.variance
         
-        b3_statistic = self.b[3] / (self.S*np.sqrt(c[3,3]))
+        b3_statistic = self.b[1] / (self.S*np.sqrt(c[1,1]))
         
-        p_b3 = 2*min(stats.t.cdf(b3_statistic, self.n-self.k-1), stats.t.sf(b3_statistic, self.n-self.k-1))
+        p_b3 = 2*min(stats.t.cdf(b3_statistic, self.n-self.d-1), stats.t.sf(b3_statistic, self.n-self.d-1))
         
         return p_b3
         
 
 
-    def Pearson():
-        pass
+    def Pearson(self):
+        pearson = stats.pearsonr(self.X[:,1], self.X[:,2])
+        return pearson
+   
 
 
-    def confidence_intervals():
-        pass
+    def confidence_intervals(self):
+        Sxx = np.sum(np.square(self.X)) - (np.square(np.sum(self.X))/self.n)
+        se_b = self.variance/Sxx
+        ci = (self.b[1], 2*np.sqrt(se_b))
+        return ci
 
     # last add a property confidence level that stores the selected confidence level.
-
-
-# if __name__ == "__main__":
-#     main()
