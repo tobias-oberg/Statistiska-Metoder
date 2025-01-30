@@ -1,8 +1,6 @@
 import numpy as np
 import scipy.stats as stats
 
-# Syy = (n*np.sum(np.square(Y)) - np.square(np.sum(Y)))/n
-# SSR = Syy - SSE
 
 class LinearRegression:
    
@@ -52,27 +50,43 @@ class LinearRegression:
 
 
 
-    def individual_significance(self):
+    def individual_significance(self): 
         c = np.linalg.pinv(self.X.T @ self.X)*self.variance
+        p_b3_list = []
+
+        for j in range(len(self.b)):
+            if j == 0:
+                continue
+            b3_statistic = self.b[j] / (self.S*np.sqrt(c[j,j]))
         
-        b3_statistic = self.b[1] / (self.S*np.sqrt(c[1,1]))
-        
-        p_b3 = 2*min(stats.t.cdf(b3_statistic, self.n-self.d-1), stats.t.sf(b3_statistic, self.n-self.d-1))
-        
-        return p_b3
+            p_b3 = 2*min(stats.t.cdf(b3_statistic, self.n-self.d-1), stats.t.sf(b3_statistic, self.n-self.d-1))
+            p_b3_list.append(p_b3)
+            
+        return p_b3_list
         
 
 
     def Pearson(self):
-        pearson = stats.pearsonr(self.X[:,1], self.X[:,2])
-        return pearson
+        pearson_list = []
+        
+        for i in range(self.d):
+            for j in range(i + 1, self.d):
+                pearson = stats.pearsonr(self.X[:, i], self.X[:, j])
+                pearson_list.append((i + 1, j + 1, pearson))
+
+    
+        return pearson_list
    
 
 
-    def confidence_intervals(self):
-        Sxx = np.sum(np.square(self.X)) - (np.square(np.sum(self.X))/self.n)
+    def confidence_intervals(self): # for loop
+        Sxx = np.sum(np.square(self.X)) - (np.square(np.sum(self.X)) / self.n)
         se_b = self.variance/Sxx
         ci = (self.b[1], 2*np.sqrt(se_b))
         return ci
 
+    
+    
+    def confidence_level(self):
+        pass
     # last add a property confidence level that stores the selected confidence level.
