@@ -124,12 +124,12 @@ class LinearRegression:
         else: 
             print("The relevance of your model is too low!")
             
-
-
- 
     
 
     def observer_bias(self, feature):
+        if feature not in self.column_names:
+            raise ValueError(f"Feature: {feature} not found in the model.")
+        
         self.column_names.index(feature)
         j = self.column_names.index(feature) + 1
         
